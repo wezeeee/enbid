@@ -1,0 +1,107 @@
+$(document).ready(function () {
+	$('#country_id').change(function () {
+		var country_id = $(this).val();
+		if (country_id == '0') {
+			$('#region_id').html('<option>- выберите регион -</option>');
+			$('#region_id').attr('disabled', true);
+			$('#city_id').html('<option>- выберите город -</option>');
+			$('#city_id').attr('disabled', true);
+			$('#xf_region, .region-name, .m-name, #xfield_holder_region').css('display', 'none');
+			$('#xf_city, .city-name, .country-name, .m-name, #xfield_holder_city').css('display', 'none');
+			$('#xf_country, .m-name, #xfield_holder_country').css('display', 'table');
+			return(false);
+		}
+		$('#xf_region, .region-name, .m-name, #xfield_holder_region').css('display', 'none');
+		$('#xf_city, .city-name, .m-name, #xfield_holder_city').css('display', 'none');
+		$('#xf_country, .country-name, #xfield_holder_country').css('display', 'table');
+		$('#region_id').attr('disabled', true);
+		$('#region_id').html('<option>загрузка...</option>');
+		
+		var url = '/engine/mods/board/get_regions.php';
+		
+		$.get(
+			url,
+			"country_id=" + country_id,
+			function (result) {
+				if (result.type == 'error') {
+					alert('error');
+					return(false);
+				}
+				else {
+					var options = ''; 
+					
+					$(result.regions).each(function() {
+						options += '<option value="' + $(this).attr('region_id') + '">' + $(this).attr('name') + '</option>';
+					});
+					
+					$('#region_id').html('<option value="0">- выберите регион -</option>'+options);
+					$('#region_id').attr('disabled', false);
+					$('#xf_region, .region-name, .m-name, #xfield_holder_region').css('display', 'none');
+					$('#xf_city, .city-name, .m-name, #xfield_holder_city').css('display', 'none');
+					$('#xf_country, .country-name, #xfield_holder_country').css('display', 'table');
+					$('#city_id').html('<option>- выберите город -</option>');
+					$('#city_id').attr('disabled', true);  	
+							
+				}
+			},
+			"json"
+		);
+	});
+
+	$('#city_id').change(function () {
+		var city_id = $(this).val();
+		
+		if (city_id == '0') {
+			$('#xf_city, .city-name, .m-name, #xfield_holder_city').css('display', 'none');
+			$('#xf_country, .country-name, .m-name, #xfield_holder_country').css('display', 'none');
+			$('#xf_region, .region-name, #xfield_holder_region').css('display', 'table');
+			return(false);
+		}
+		$('#xf_city, .city-name, #xfield_holder_city').css('display', 'table');
+			$('#xf_country, .country-name, .m-name, #xfield_holder_country').css('display', 'none');
+			$('#xf_region, .region-name, .m-name, #xfield_holder_region').css('display', 'none');
+	});
+	
+$('#region_id').change(function () {
+		var region_id = $(this).val(); //$('#region_id :selected').val();
+		//alert (region_id);
+		if (region_id == '0') {
+			$('#city_id').html('<option>- выберите город -</option>');
+			$('#city_id').attr('disabled', true);
+			$('#xf_city, .city-name, .m-name, #xfield_holder_city').css('display', 'none');
+			$('#xf_country, .country-name, #xfield_holder_country').css('display', 'table');
+			$('#xf_region, .region-name, .m-name, #xfield_holder_region').css('display', 'none');
+			return(false);
+		}
+		$('#city_id').attr('disabled', true);
+		$('#city_id').html('<option>загрузка...</option>');
+		
+		var url = '/engine/mods/board/get_city.php';
+		
+		$.get(
+			url,
+			"region_id=" + region_id,
+			
+			function (result) {
+				if (result.type == 'error') {
+					alert('error');
+					return(false);
+				}
+				else {
+					var options = ''; 
+					$(result.citys).each(function() {
+						options += '<option value="' + $(this).attr('city_id') + '">' + $(this).attr('name') + '</option>'; 
+						
+					});
+					$('#city_id').html('<option value="0">- выберите город -</option>'+options);		
+					$('#city_id').attr('disabled', false);
+					$('#xf_city, .city-name, .m-name, #xfield_holder_city').css('display', 'none');
+					$('#xf_region, .region-name, #xfield_holder_region').css('display', 'table');
+					$('#xf_country, .country-name, .m-name, #xfield_holder_country').css('display', 'none');
+									
+				}
+			},
+			"json" 
+		);
+	});	
+});

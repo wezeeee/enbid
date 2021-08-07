@@ -1,0 +1,245 @@
+$(function() {
+
+    $(window).scroll(function() {
+        if($(this).scrollTop() > 100) {
+            $('#btnToTop').fadeIn();
+        } else {
+            $('#btnToTop').fadeOut();
+        }
+    })
+    $('#btnToTop').click(function() {
+        $('body,html').animate({scrollTop:0},800);
+    });
+	
+	$('body').on('click', '.fav-guest', function() {
+	DLEalert('<a href="/index.php?do=register">Зарегистрируйтесь</a> или <a href="#" role="button" data-toggle="modal" data-target="#modal-login">войдите</a>, и вы сможете добавлять объявления, комментировать, создавать свои закладки и многое другое!', 'Необходима регистрация');
+	return false;
+	});
+	$('body').on('click', '.mes-guest', function() {
+	DLEalert('<a href="/index.php?do=register">Зарегистрируйтесь</a> или <a href="#" role="button" data-toggle="modal" data-target="#modal-login">войдите</a>, и вы сможете писать сообщения продавцам!', 'Необходима регистрация');
+	return false;
+	});
+	$('.f-text-in').wTextSlicer({
+    height: '200',
+    textExpand: 'Показать полностью',
+    textHide: 'Свернуть'
+   });
+	$('body').on('click','#pagi-load a',function(){
+		var $urlNext = $(this).attr('href');
+		var $scrollNext = $(this).offset().top - 200;
+        if ($urlNext !== undefined) {
+			$.ajax({
+				url: $urlNext,
+				beforeSend: function() {
+					ShowLoading('');
+				},			 
+                success: function(data) {
+                    $('#bottom-nav').remove();
+                    $('#dle-content').append($('#dle-content', data).html());
+                    $('#dle-content').after($('#bottom-nav'));
+					$('#tooltip').wTooltip();
+					$('.prices').pricenews();
+					window.history.pushState("", "", $urlNext);
+					$('html, body').animate({scrollTop:$scrollNext}, 800);	
+					HideLoading('');
+                },
+				  error: function() {				
+					HideLoading('');
+					alert('что-то пошло не так');
+				  }
+			});
+		};
+		return false;
+	});
+	$('#user_sob').html($('#saler').html());
+	// проверяем куки по новостям на главной
+	if($.cookie('activeView')) {
+		var activeView = $.cookie('activeView');
+		if ( activeView == 'list' ) { 
+			$('[data-type="grid-list"]').addClass('current');
+            $('[data-type="grid-thumb-3col"], [data-type="grid-thumb"]').removeClass('current');	
+            $('#grid').removeClass('grid-thumb-3col grid-thumb').addClass('grid-list');			
+		}
+		
+		if ( activeView == 'box' ) { 
+			$('[data-type="grid-thumb"]').addClass('current');
+			$('[data-type="grid-list"], [data-type="grid-thumb-3col"]').removeClass('current');
+			$('#grid').removeClass('grid-thumb-3col grid-list').addClass('grid-thumb');
+		}
+		
+		if ( activeView == 'grid' ) { 
+			$('[data-type="grid-thumb-3col"]').addClass('current');
+			$('[data-type="grid-list"], [data-type="grid-thumb"]').removeClass('current');
+			$('#grid').removeClass('grid-thumb grid-list').addClass('grid-thumb-3col');
+		}
+		
+	}
+	
+	$('[data-type="grid-list"]').click(function(){
+		/*записываем куки*/
+		var activeView = 'list';
+		$.cookie('activeView', activeView, {
+			expires: 7
+		});
+		$('[data-type="grid-thumb-3col"], [data-type="grid-thumb"]').removeClass('current');
+		$('[data-type="grid-list"]').addClass('current');
+		$('#grid').removeClass('grid-thumb-3col grid-thumb').addClass('grid-list');
+	});
+	
+	$('[data-type="grid-thumb"]').click(function(){
+		/*записываем куки*/
+		var activeView = 'box';
+		$.cookie('activeView', activeView, {
+			expires: 7
+		});
+		$('[data-type="grid-thumb"]').addClass('current');
+		$('[data-type="grid-thumb-3col"], [data-type="grid-list"]').removeClass('current');
+		$('#grid').removeClass('grid-thumb-3col grid-list').addClass('grid-thumb');
+	});
+	
+	$('[data-type="grid-thumb-3col"]').click(function(){
+		/*записываем куки*/
+		var activeView = 'grid';
+		$.cookie('activeView', activeView, {
+			expires: 7
+		});
+		$('[data-type="grid-thumb-3col"]').addClass('current');
+		$('[data-type="grid-thumb"], [data-type="grid-list"]').removeClass('current');
+		$('#grid').removeClass('grid-thumb grid-list').addClass('grid-thumb-3col');
+	});
+	$(document).on('click', '.mega-dropdown', function(e) {
+		e.stopPropagation()
+	});
+	$('#tooltip').wTooltip();
+	$('#ac-av').html($('#lb-ava').html());
+	
+	$(".add-comm-btn").click(function(){
+		$("#add-comm-form").slideToggle(200);
+	});
+	$(".reply").click(function(){
+		$("#add-comm-form").slideDown(200);
+	});
+	$('body').on('click','.ac-textarea textarea, .fr-wrapper',function(){
+		$('.add-comm-form').addClass('active').find('.ac-protect').slideDown(400);
+	});
+	$('.lb-soc a, .ac-soc a').on('click',function(){
+	   var href = $(this).attr('href');
+       var width  = 820;
+       var height = 420;
+       var left   = (screen.width  - width)/2;
+       var top   = (screen.height - height)/2-100;   
+
+       auth_window = window.open(href, 'auth_window', "width="+width+",height="+height+",top="+top+",left="+left+"menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no");
+       return false;
+	});
+    $('#dle-content > #dle-ajax-comments').appendTo($('#full-comms')); 
+	$(".st-filt").click(function(){
+		$("#filter-wrap").fadeToggle(0);
+	});
+	
+});
+
+/*!
+ * jQuery Cookie Plugin v1.3
+ * https://github.com/carhartl/jquery-cookie
+ *
+ * Copyright 2011, Klaus Hartl
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.opensource.org/licenses/GPL-2.0
+ */
+ (function(e,h,j){function k(b){return b}function l(b){return decodeURIComponent(b.replace(m," "))}var m=/\+/g,d=e.cookie=function(b,c,a){if(c!==j){a=e.extend({},d.defaults,a);null===c&&(a.expires=-1);if("number"===typeof a.expires){var f=a.expires,g=a.expires=new Date;g.setDate(g.getDate()+f)}c=d.json?JSON.stringify(c):String(c);return h.cookie=[encodeURIComponent(b),"=",d.raw?c:encodeURIComponent(c),a.expires?"; expires="+a.expires.toUTCString():"",a.path?"; path="+a.path:"",a.domain?"; domain="+
+a.domain:"",a.secure?"; secure":""].join("")}c=d.raw?k:l;a=h.cookie.split("; ");f=0;for(g=a.length;f<g;f++){var i=a[f].split("=");if(c(i.shift())===b)return b=c(i.join("=")),d.json?JSON.parse(b):b}return null};d.defaults={};e.removeCookie=function(b,c){return null!==e.cookie(b)?(e.cookie(b,null,c),!0):!1}})(jQuery,document);
+
+ 
+function showTooltip()
+{
+    var myDiv = document.getElementById('phone2');
+    var myLink = document.getElementById('phone1');
+    if(myDiv.style.display == 'none')
+    {
+        myDiv.style.display = 'block';
+        myLink.style.display = 'none';
+    } 
+
+    else {
+        myDiv.style.display = 'none';
+    }
+    return false;
+}
+
+	// tooltip 
+	jQuery.fn.wTooltip = function(){
+		var targets = $('[rel~=tooltip]'),
+			target = false,
+			tooltip = false,
+			title = false;
+		targets.bind('mouseenter', function () {
+			target = $(this);
+			tip = target.attr('title');
+			tooltip = $('<div id="tooltip"></div>');
+			if (!tip || tip == '') return false;
+			target.removeAttr('title');
+			tooltip.css('opacity', 0).html(tip).appendTo('body');
+			var init_tooltip = function () {
+					if ($(window).width() < tooltip.outerWidth() * 1.5) tooltip.css('max-width', $(window).width() / 2);
+					else tooltip.css('max-width', 340);
+					var pos_left = target.offset().left + (target.outerWidth() / 2) - (tooltip.outerWidth() / 2),
+						pos_top = target.offset().top - tooltip.outerHeight() - 18;
+					if (pos_left < 0) {
+						pos_left = target.offset().left + target.outerWidth() / 2 - 18;
+						tooltip.addClass('left')
+					} else tooltip.removeClass('left');
+					if (pos_left + tooltip.outerWidth() > $(window).width()) {
+						pos_left = target.offset().left - tooltip.outerWidth() + target.outerWidth() / 2 + 20;
+						tooltip.addClass('right')
+					} else tooltip.removeClass('right');
+					if (pos_top < 0) {
+						var pos_top = target.offset().top + target.outerHeight();
+						tooltip.addClass('top')
+					} else tooltip.removeClass('top');
+					tooltip.css({
+						left: pos_left,
+						top: pos_top
+					}).animate({
+						top: '+=10',
+						opacity: 1
+					}, 100)
+				};
+			init_tooltip();
+			$(window).resize(init_tooltip);
+			var remove_tooltip = function () {
+					tooltip.animate({
+						top: '-=10',
+						opacity: 0
+					}, 50, function () {
+						$(this).remove()
+					});
+					target.attr('title', tip)
+				};
+			target.bind('mouseleave', remove_tooltip);
+			tooltip.bind('click', remove_tooltip)
+		})
+	};
+	
+jQuery.fn.wTextSlicer = function(options){
+   var options = jQuery.extend({
+    height: '200',
+    textExpand: 'expand text',
+    textHide: 'hide text'
+    },options);
+   return this.each(function() {
+     var a = $(this),
+       h = a.outerHeight();
+     if ( h > options.height ) {
+       a.addClass('slice slice-masked').attr('data-height',h).height(options.height).after('<div class="slice-btn"><span>'+options.textExpand+'</span></div>');
+     };
+     var bt = $(this).next('.slice-btn').children('span');
+     bt.click(function() {
+       var ah = parseInt(a.css("height"), 10);
+       ah == h ? a.css({'height':options.height}) : a.css({'height':h});
+       bt.text(bt.text() == options.textExpand ? options.textHide : options.textExpand);
+       a.toggleClass('slice-masked');
+     });
+   });
+};
